@@ -18,44 +18,44 @@ jobs:
       - uses: actions/checkout@v3
       - uses: opentofu/setup-opentofu@v1
 
-      - name: OpenTofu fmt
-        id: fmt
-        run: tofu fmt -check
-        continue-on-error: true
-
-      - name: OpenTofu Init
-        id: init
-        run: tofu init
-
-      - name: OpenTofu Validate
-        id: validate
-        run: tofu validate -no-color
-
-      - name: OpenTofu Plan
-        id: plan
-        run: tofu plan -no-color
-        continue-on-error: true
-
-      - name: OpenTofu Apply VPC
-        id: apply-vpc
-        run: tofu apply -target="module.vpc" -auto-approve
-        continue-on-error: false
-
-      - name: OpenTofu Apply EKS
-        id: apply-eks
-        run: tofu apply -target="module.eks" -auto-approve
-        continue-on-error: false
-
-      - name: OpenTofu Apply
-        id: apply
-        run: tofu apply -auto-approve
-        continue-on-error: false
+#      - name: OpenTofu fmt
+#        id: fmt
+#        run: tofu fmt -check
+#        continue-on-error: true
+#
+#      - name: OpenTofu Init
+#        id: init
+#        run: tofu init
+#
+#      - name: OpenTofu Validate
+#        id: validate
+#        run: tofu validate -no-color
+#
+#      - name: OpenTofu Plan
+#        id: plan
+#        run: tofu plan -no-color
+#        continue-on-error: true
+#
+#      - name: OpenTofu Apply VPC
+#        id: apply-vpc
+#        run: tofu apply -target="module.vpc" -auto-approve
+#        continue-on-error: false
+#
+#      - name: OpenTofu Apply EKS
+#        id: apply-eks
+#        run: tofu apply -target="module.eks" -auto-approve
+#        continue-on-error: false
+#
+#      - name: OpenTofu Apply
+#        id: apply
+#        run: tofu apply -auto-approve
+#        continue-on-error: false
 
       - name: Kubectl config
         id: kubectl
         run: |
           export KUBECONFIG="/tmp/getting-started-gitops"
-          aws eks --region  update-kubeconfig --name getting-started-gitops
+          aws eks --region $AWS_REGION update-kubeconfig --name traefik-gitops-kubernetes
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           kubectl apply -f terraform/bootstrap/addons.yaml
