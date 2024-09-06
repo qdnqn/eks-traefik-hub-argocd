@@ -10,6 +10,7 @@ spec:
     repoURL: "https://github.com/qdnqn/eks-traefik-hub-argocd.git"
     targetRevision: main
     helm:
+      releaseName: traefik
       valueFiles:
         - values.yaml
   destination:
