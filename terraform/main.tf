@@ -39,7 +39,7 @@ provider "kubernetes" {
 }
 
 locals {
-  name   = "gitops-demo"
+  name   = "kubernetes-gitops-demo"
   region = var.region
 
   cluster_version = var.kubernetes_version
