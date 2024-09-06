@@ -3,6 +3,11 @@ name: Deploy EKS, argocd and traefik
 on:
   workflow_dispatch:
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,4 +49,16 @@ jobs:
       - name: OpenTofu Apply
         id: apply
         run: tofu apply -auto-approve
+        continue-on-error: false
+
+      - name: Kubectl config
+        id: kubectl
+        run: |
+          export KUBECONFIG="/tmp/getting-started-gitops"
+          aws eks --region  update-kubeconfig --name getting-started-gitops
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          kubectl apply -f terraform/bootstrap/addons.yaml
+          kubectl apply -f terraform/bootstrap/workload.yaml
+
         continue-on-error: false
