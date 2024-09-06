@@ -1,0 +1,25 @@
+name: Destroy EKS, argocd and traefik
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/
+    steps:
+      - uses: actions/checkout@v3
+      - uses: opentofu/setup-opentofu@v1
+
+      - name: Run script file
+        run: |
+          chmod +x ./destroy.sh
+          ./destroy.sh
+        shell: bash
