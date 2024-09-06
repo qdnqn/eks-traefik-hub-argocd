@@ -6,11 +6,16 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/qdnqn
-    targetRevision: HEAD
     path: helm/traefik
+    repoURL: "https://github.com/qdnqn/eks-traefik-hub-argocd.git"
+    targetRevision: main
+    helm:
+      valueFiles:
+        - values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: guestbook
+    namespace: traefik
   syncPolicy:
     automated: {}
+    syncOptions:
+      - CreateNamespace=true
