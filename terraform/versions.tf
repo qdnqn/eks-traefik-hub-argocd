@@ -17,9 +17,9 @@ terraform {
   }
 
   ##  Used for end-to-end testing on project; update to suit your needs
-  backend "s3" {
-    bucket = "terraform-state"
-    region = "eu-west-2"
-    key    = "tf/terraform.tfstate"
-  }
+#   backend "s3" {
+#     bucket = "terraform-state"
+#     region = "eu-west-2"
+#     key    = "terraform.tfstate"
+#   }
 }
