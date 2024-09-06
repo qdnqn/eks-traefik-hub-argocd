@@ -59,6 +59,6 @@ jobs:
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           kubectl apply -f bootstrap/addons.yaml
-          kubectl apply -f bootstrap/workload.yaml
+          kubectl apply -f bootstrap/workloads.yaml
 
         continue-on-error: false
