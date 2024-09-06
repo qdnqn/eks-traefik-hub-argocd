@@ -32,7 +32,7 @@ jobs:
         id: envsubst
         run: |
           sudo apt-get update
-          sudo apt-get install -y gettext sponge moreutils
+          sudo apt-get install -y gettext moreutils
           envsubst < versions.tf | sponge versions.tf
         continue-on-error: false
 
