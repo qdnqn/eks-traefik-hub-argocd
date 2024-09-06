@@ -40,26 +40,26 @@ jobs:
         run: tofu init
 
       - name: OpenTofu Destroy GitOps bridge
-        id: apply-eks
+        id: destroy-gitops
         run: tofu destroy -target="module.gitops_bridge_bootstrap" -auto-approve
         continue-on-error: false
 
       - name: OpenTofu Destroy Addons
-        id: apply-eks
+        id: destroy-addons
         run: tofu destroy -target="module.eks_blueprints_addons" -auto-approve
         continue-on-error: false
 
       - name: OpenTofu Destroy EKS
-        id: apply-eks
+        id: destroy-eks
         run: tofu destroy -target="module.eks" -auto-approve
         continue-on-error: false
 
       - name: OpenTofu Destroy VPC
-        id: apply-vpc
+        id: destroy-vpc
         run: tofu destroy -target="module.vpc" -auto-approve
         continue-on-error: false
 
       - name: OpenTofu Destroy
-        id: apply
+        id: destroy
         run: tofu destroy -auto-approve
         continue-on-error: false
