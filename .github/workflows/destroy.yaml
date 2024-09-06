@@ -26,8 +26,8 @@ jobs:
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           
-          kubectl delete -f bootstrap/workloads.yaml
-          kubectl delete -f bootstrap/addons.yaml
+          kubectl delete -f bootstrap/workloads.yaml || echo "Already deleted"
+          kubectl delete -f bootstrap/addons.yaml || echo "Already deleted"
         continue-on-error: false
 
       - name: OpenTofu fmt
