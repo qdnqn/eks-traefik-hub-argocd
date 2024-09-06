@@ -6,32 +6,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-  defaults:
-    run:
-      working-directory: terraform/
-  steps:
-    - uses: actions/checkout@v3
-    - uses: opentofu/setup-opentofu@v1
+    defaults:
+      run:
+        working-directory: terraform/
+    steps:
+      - uses: actions/checkout@v3
+      - uses: opentofu/setup-opentofu@v1
 
-    - name: OpenTofu fmt
-      id: fmt
-      run: tofu fmt -check
-      continue-on-error: true
+      - name: OpenTofu fmt
+        id: fmt
+        run: tofu fmt -check
+        continue-on-error: true
 
-    - name: OpenTofu Init
-      id: init
-      run: tofu init
+      - name: OpenTofu Init
+        id: init
+        run: tofu init
 
-    - name: OpenTofu Validate
-      id: validate
-      run: tofu validate -no-color
+      - name: OpenTofu Validate
+        id: validate
+        run: tofu validate -no-color
 
-    - name: OpenTofu Plan
-      id: plan
-      run: tofu plan -no-color
-      continue-on-error: true
+      - name: OpenTofu Plan
+        id: plan
+        run: tofu plan -no-color
+        continue-on-error: true
 
-    - name: OpenTofu Apply
-      id: apply
-      run: tofu apply -no-color
-      continue-on-error: false
+      - name: OpenTofu Apply
+        id: apply
+        run: tofu apply -no-color
+        continue-on-error: false
