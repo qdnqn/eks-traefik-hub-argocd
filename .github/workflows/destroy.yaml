@@ -26,8 +26,8 @@ jobs:
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           
-          kubectl delete -f bootstrap/workloads.yaml || echo "Already deleted"
-          kubectl delete -f bootstrap/addons.yaml || echo "Already deleted"
+          kubectl delete ns/argocd
+          kubectl delete ns/traefik
         continue-on-error: false
 
       - name: OpenTofu fmt
@@ -38,6 +38,16 @@ jobs:
       - name: OpenTofu Init
         id: init
         run: tofu init
+
+      - name: OpenTofu Destroy GitOps bridge
+        id: apply-eks
+        run: tofu destroy -target="module.gitops_bridge_bootstrap" -auto-approve
+        continue-on-error: false
+
+      - name: OpenTofu Destroy Addons
+        id: apply-eks
+        run: tofu destroy -target="module.eks_blueprints_addons" -auto-approve
+        continue-on-error: false
 
       - name: OpenTofu Destroy EKS
         id: apply-eks
