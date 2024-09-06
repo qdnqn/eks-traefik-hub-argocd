@@ -13,6 +13,7 @@ spec:
       releaseName: traefik
       valueFiles:
         - values.yaml
+        - values-hub.yaml
   destination:
     name: in-cluster
     namespace: traefik
