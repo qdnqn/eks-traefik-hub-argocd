@@ -31,7 +31,17 @@ jobs:
         run: tofu plan -no-color
         continue-on-error: true
 
+      - name: OpenTofu Apply VPC
+        id: apply
+        run: tofu apply -target="module.vpc" -auto-approve
+        continue-on-error: false
+
+      - name: OpenTofu Apply VPC
+        id: apply
+        run: tofu apply -target="module.eks" -auto-approve
+        continue-on-error: false
+
       - name: OpenTofu Apply
         id: apply
-        run: tofu apply -no-color
+        run: tofu apply -auto-approve
         continue-on-error: false
