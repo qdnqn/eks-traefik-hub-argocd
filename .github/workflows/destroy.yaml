@@ -21,10 +21,11 @@ jobs:
       - name: Kubectl config
         id: kubectl
         run: |
-          export KUBECONFIG="/tmp/getting-started-gitops"
+          export KUBECONFIG="/tmp/traefik-gitops-kubernetes"
           aws eks --region $AWS_REGION update-kubeconfig --name traefik-gitops-kubernetes
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
+          
           kubectl delete -f bootstrap/workloads.yaml
           kubectl delete -f bootstrap/addons.yaml
         continue-on-error: false
