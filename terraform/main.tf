@@ -202,8 +202,8 @@ module "eks" {
       instance_types = ["m5.large"]
 
       min_size     = 1
-      max_size     = 3
-      desired_size = 2
+      max_size     = 1
+      desired_size = 1
     }
   }
 
