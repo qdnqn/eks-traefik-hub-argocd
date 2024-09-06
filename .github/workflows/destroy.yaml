@@ -1,4 +1,4 @@
-name: Destroy EKS, argocd and traefik
+name: Destroy EKS, ArgoCD and Traefik
 
 on:
   workflow_dispatch:

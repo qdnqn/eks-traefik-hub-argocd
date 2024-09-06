@@ -1,4 +1,4 @@
-name: Deploy EKS, argocd and traefik
+name: Deploy EKS, ArgoCD and Traefik
 
 on:
   workflow_dispatch:
