@@ -21,12 +21,19 @@ jobs:
       - name: Create bucket in S3
         uses: aitorres/aws-s3-create-bucket@v1.2.0
         with:
-          bucket-name: 'terraform-state'
+          bucket-name: ${{ secrets.TERRAFORM_STATE_NAME }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
           acl: 'private'
         continue-on-error: true
+
+      - name: Envsubst s3 bucket
+        id: envsubst
+        run: |
+          apt-get install -y gettext sponge moreutils
+          envsubst < versions.tf | sponge versions.tf
+        continue-on-error: false
 
       - name: OpenTofu fmt
         id: fmt

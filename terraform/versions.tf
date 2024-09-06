@@ -18,8 +18,8 @@ terraform {
 
   #  Used for end-to-end testing on project; update to suit your needs
   backend "s3" {
-    bucket = "terraform-state"
-    region = "eu-west-2"
+    bucket = "$TERRAFORM_STATE_NAME"
+    region = "$AWS_REGION"
     key    = "terraform.tfstate"
   }
 }
