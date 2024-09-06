@@ -32,12 +32,12 @@ jobs:
         continue-on-error: true
 
       - name: OpenTofu Apply VPC
-        id: apply
+        id: apply-vpc
         run: tofu apply -target="module.vpc" -auto-approve
         continue-on-error: false
 
       - name: OpenTofu Apply VPC
-        id: apply
+        id: apply-eks
         run: tofu apply -target="module.eks" -auto-approve
         continue-on-error: false
 
