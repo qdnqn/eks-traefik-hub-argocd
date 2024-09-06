@@ -39,7 +39,7 @@ provider "kubernetes" {
 }
 
 locals {
-  name   = "traefik-gitops-kubernetes-demo"
+  name   = "traefik-gitops-kubernetes-gitops-demo"
   region = var.region
 
   cluster_version = var.kubernetes_version
