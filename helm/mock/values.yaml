@@ -10,11 +10,7 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
-command:
-  - "prism"
-
 arguments:
-  - "mock"
   - "/tmp/openapi-spec.yaml"
 
 imagePullSecrets: []
