@@ -51,9 +51,8 @@ service:
 ingress:
   enabled: enabled
   className: "traefik"
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: mock-stripprefix@kubernetescrd
   hosts:
     - paths:
         - path: /mock/
