@@ -56,8 +56,7 @@ ingress:
     # kubernetes.io/tls-acme: "true"
   hosts:
     - paths:
-        - path: /mock
-
+        - path: /mock/
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
