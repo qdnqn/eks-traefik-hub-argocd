@@ -52,7 +52,7 @@ ingress:
   enabled: enabled
   className: "traefik"
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: mock-stripprefix
+    traefik.ingress.kubernetes.io/router.middlewares: mock-stripprefix.mock@kubernetescrd
   hosts:
     - paths:
         - path: /mock/

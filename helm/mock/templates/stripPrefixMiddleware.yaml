@@ -2,6 +2,7 @@ apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: mock-stripprefix
+  namespace: mock
 spec:
   stripPrefix:
     prefixes:
