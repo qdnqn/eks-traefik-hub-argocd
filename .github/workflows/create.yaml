@@ -7,8 +7,9 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  AWS_DEPLOYMENT_NAME: ${{ secrets.DEPLOYMENT_NAME }}
+  AWS_DEPLOYMENT_NAME: ${{ secrets.AWS_DEPLOYMENT_NAME }}
   TERRAFORM_STATE_NAME: ${{ secrets.TERRAFORM_STATE_NAME }}
+  TRAEFIK_TOKEN: ${{ secrets.TRAEFIK_TOKEN }}
 
 jobs:
   build:
@@ -43,9 +44,7 @@ jobs:
           
           envsubst < versions.tf | sponge versions.tf
           envsubst < main.tf | sponge main.tf
-          
-          cat main.tf
-          exit 127
+          envsubst < ../plain/traefik/secret.yaml | sponge ../plain/traefik/secret.yaml
         continue-on-error: false
 
       - name: OpenTofu fmt
@@ -88,7 +87,8 @@ jobs:
           aws eks --region $AWS_REGION update-kubeconfig --name kubernetes-gitops-demo
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
+          kubectl create ns traefik
+          kubectl apply -f ../plain/traefik/secret.yaml
           kubectl apply -f bootstrap/addons.yaml
           kubectl apply -f bootstrap/workloads.yaml
-
         continue-on-error: false
