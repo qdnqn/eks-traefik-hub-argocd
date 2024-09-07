@@ -11,10 +11,10 @@ image:
   tag: "4"
 
 arguments:
-  - mock
-  - -h
+  - "mock"
+  - "-h"
   - "0.0.0.0"
-  - /tmp/openapi-spec.yaml
+  - "/tmp/openapi-spec.yaml"
 
 imagePullSecrets: []
 nameOverride: ""
