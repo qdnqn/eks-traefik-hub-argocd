@@ -6,8 +6,7 @@ replicaCount: 1
 
 image:
   repository: stoplight/prism
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  pullPolicy: Always
   tag: "4"
 
 arguments:
