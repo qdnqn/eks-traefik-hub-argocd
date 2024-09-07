@@ -34,9 +34,9 @@ jobs:
           aws eks --region $AWS_REGION update-kubeconfig --name kubernetes-gitops-demo
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
-          
-          kubectl delete --wait=false ns/argocd --force || echo "Already gone"
-          kubectl delete --wait=false ns/traefik --force || echo "Already gone"
+          kubectl get pods
+#          kubectl delete --wait=false ns/argocd --force || echo "Already gone"
+#          kubectl delete --wait=false ns/traefik --force || echo "Already gone"
         continue-on-error: true
 
       - name: OpenTofu fmt
