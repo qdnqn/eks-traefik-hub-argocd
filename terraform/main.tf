@@ -39,7 +39,7 @@ provider "kubernetes" {
 }
 
 locals {
-  name   = "kubernetes-gitops-demo"
+  name   = "$AWS_DEPLOYMENT_NAME"
   region = var.region
 
   cluster_version = var.kubernetes_version

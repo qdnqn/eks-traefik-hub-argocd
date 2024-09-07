@@ -7,6 +7,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_DEPLOYMENT_NAME: ${{ secrets.DEPLOYMENT_NAME }}
   TERRAFORM_STATE_NAME: ${{ secrets.TERRAFORM_STATE_NAME }}
 
 jobs:
@@ -25,6 +26,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gettext moreutils
           envsubst < versions.tf | sponge versions.tf
+          envsubst < main.tf | sponge main.tf
         continue-on-error: false
 
       - name: Kubectl config
@@ -35,8 +37,8 @@ jobs:
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           kubectl get pods
-#          kubectl delete --wait=false ns/argocd --force || echo "Already gone"
-#          kubectl delete --wait=false ns/traefik --force || echo "Already gone"
+          kubectl delete --wait=false ns/argocd --force || echo "Already gone"
+          kubectl delete --wait=false ns/traefik --force || echo "Already gone"
         continue-on-error: true
 
       - name: OpenTofu fmt

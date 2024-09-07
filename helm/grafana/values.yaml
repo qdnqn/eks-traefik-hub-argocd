@@ -279,7 +279,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   labels: {}
-  path: /grafana
+  path: /
 
   # pathType is only for k8s >= 1.1=
   pathType: Prefix
