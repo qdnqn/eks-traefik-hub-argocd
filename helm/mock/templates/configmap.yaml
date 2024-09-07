@@ -4,5 +4,4 @@ metadata:
   name: mocks
   namespace: mock
 data:
-  openapi-spec.yaml: |
-    {{ .Files.Get "resources/product-catalog-oas.yaml" }}
+  openapi-spec.yaml: | {{ $.Files.Get "resources/product-catalog.oas.yaml" | nindent 4 }}
