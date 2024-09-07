@@ -52,6 +52,7 @@ ingress:
   hosts:
     - paths:
         - path: /mock
+
           pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
@@ -87,17 +88,15 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
-
+volumes:
+ - name: mocks
+   configMap:
+     name: mocks
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+ - name: mocks
+   mountPath: "/tmp"
+   readOnly: true
 
 nodeSelector: {}
 
