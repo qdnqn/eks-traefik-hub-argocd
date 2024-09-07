@@ -1,0 +1,14 @@
+apiVersion: hub.traefik.io/v1alpha1
+kind: APIRateLimit
+metadata:
+  name: my-rate-limit
+  namespace: apps
+spec:
+  # Rate limit configuration, this config allows 100 requests/minute.
+  limit: 5 # 100 requests
+  period: 1m # One minute
+  groups:
+    - support
+  apiSelector:
+    matchLabels:
+      module: crm
