@@ -23,7 +23,7 @@ jobs:
       - name: Create bucket in S3
         uses: aitorres/aws-s3-create-bucket@v1.2.0
         with:
-          bucket-name: ${{ secrets.TERRAFORM_STATE_NAME }}
+          bucket-name: ${{ secrets.TERRAFORM_STATE_NAME }}-${{secrets.AWS_DEPLOYMENT_NAME }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -35,6 +35,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gettext moreutils
+          
+          echo $AWS_DEPLOYMENT_NAME
+          
           envsubst < versions.tf | sponge versions.tf
           envsubst < main.tf | sponge main.tf
         continue-on-error: false
