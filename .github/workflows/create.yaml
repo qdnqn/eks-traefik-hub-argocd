@@ -9,7 +9,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_DEPLOYMENT_NAME: ${{ secrets.AWS_DEPLOYMENT_NAME }}
   TERRAFORM_STATE_NAME: ${{ secrets.TERRAFORM_STATE_NAME }}
-  TRAEFIK_TOKEN: ${{ secrets.TRAEFIK_TOKEN }}
+  TRAEFIK_TOKEN: ${{ secrets.TRAEFIK_TOKEN  }}
 
 jobs:
   build:
