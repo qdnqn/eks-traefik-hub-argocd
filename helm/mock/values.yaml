@@ -10,7 +10,7 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "4"
 
-command:
+arguments:
   - mock
   - -h
   - "0.0.0.0"
