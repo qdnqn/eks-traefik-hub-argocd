@@ -8,11 +8,13 @@ image:
   repository: stoplight/prism
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "4"
 
 arguments:
-  - "mock"
-  - "/tmp/openapi-spec.yaml"
+  - mock
+  - -h
+  - "0.0.0.0"
+  - /tmp/openapi-spec.yaml
 
 imagePullSecrets: []
 nameOverride: ""
