@@ -11,6 +11,7 @@ image:
   tag: "latest"
 
 arguments:
+  - "mock"
   - "/tmp/openapi-spec.yaml"
 
 imagePullSecrets: []
