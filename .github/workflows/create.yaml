@@ -88,7 +88,7 @@ jobs:
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           kubectl create ns traefik
-          kubectl apply -f ../plain/traefik/secret.yaml
+          kubectl create secret generic token --from-literal=token=$TRAEFIK_TOKEN -n traefik
           kubectl apply -f bootstrap/addons.yaml
           kubectl apply -f bootstrap/workloads.yaml
         continue-on-error: false
