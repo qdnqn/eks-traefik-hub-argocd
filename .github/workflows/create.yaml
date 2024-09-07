@@ -36,10 +36,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gettext moreutils
           
-          echo $AWS_DEPLOYMENT_NAME
+          if [[ $AWS_DEPLOYMENT_NAME == "" ]]; then
+            echo "Please set AWS_DEPLOYMENT_NAME secret in the Github!"
+            exit 127
+          fi
           
           envsubst < versions.tf | sponge versions.tf
           envsubst < main.tf | sponge main.tf
+          
+          cat main.tf
+          exit 127
         continue-on-error: false
 
       - name: OpenTofu fmt
