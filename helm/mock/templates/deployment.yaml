@@ -36,12 +36,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - "mock"
-          args:
-            - "-h"
-            - "0.0.0.0"
-            - "/tmp/openapi-spec.yaml"
+          args: {{ .Values.arguments | nindent 12 }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
