@@ -44,7 +44,6 @@ jobs:
           
           envsubst < versions.tf | sponge versions.tf
           envsubst < main.tf | sponge main.tf
-          envsubst < ../plain/traefik/secret.yaml | sponge ../plain/traefik/secret.yaml
         continue-on-error: false
 
       - name: OpenTofu fmt
