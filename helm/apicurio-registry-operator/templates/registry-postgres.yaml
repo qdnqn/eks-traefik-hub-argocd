@@ -2,6 +2,7 @@ apiVersion: registry.apicur.io/v1
 kind: ApicurioRegistry
 metadata:
   name: ikenna-apicurioregistry-sql
+  namespace: apicurio-registry-operator-namespace
 spec:
   configuration:
     persistence: "sql"
