@@ -44,7 +44,7 @@ spec:
     name: ikenna-apicurio-superuser
 
   storage:
-    storageClass: standard
+    storageClass: gp2
     size: 1Gi
 
   resources:
