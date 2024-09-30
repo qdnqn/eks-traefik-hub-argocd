@@ -59,7 +59,7 @@ locals {
 
   aws_addons = {
     enable_cert_manager                          = try(var.addons.enable_cert_manager, false)
-    enable_aws_efs_csi_driver                    = try(var.addons.enable_aws_efs_csi_driver, true)
+    enable_aws_efs_csi_driver                    = try(var.addons.enable_aws_efs_csi_driver, false)
     enable_aws_fsx_csi_driver                    = try(var.addons.enable_aws_fsx_csi_driver, false)
     enable_aws_cloudwatch_metrics                = try(var.addons.enable_aws_cloudwatch_metrics, false)
     enable_aws_privateca_issuer                  = try(var.addons.enable_aws_privateca_issuer, false)

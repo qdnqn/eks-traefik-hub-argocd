@@ -44,5 +44,5 @@ spec:
     name: ikenna-apicurio-superuser
 
   storage:
-    storageClass: efs-sc
+    storageClass: gp3
     size: 1Gi
