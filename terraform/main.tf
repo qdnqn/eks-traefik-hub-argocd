@@ -225,6 +225,7 @@ module "eks" {
         }
       })
     }
+    aws-ebs-csi-driver = { most_recent = true }
   }
   tags = local.tags
 }
