@@ -773,7 +773,7 @@ spec:
                   fieldPath: metadata.namespace
             - name: OPERATOR_NAME
               value: apicurio-registry-operator
-          image: quay.io/apicurio/apicurio-registry-operator:1.0.0
+          image: quay.io/apicurio/apicurio-registry-operator:1.1.3
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
