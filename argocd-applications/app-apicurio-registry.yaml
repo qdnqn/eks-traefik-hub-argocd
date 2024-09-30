@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: apicurio
+  name: apicurio-registry
   namespace: argocd
 spec:
   project: default
   source:
-    path: helm/apicurio-registry-operator
+    path: helm/apicurio-registry
     repoURL: "https://github.com/qdnqn/eks-traefik-hub-argocd.git"
     targetRevision: main
     helm:
-      releaseName: apicurio-registry-operator
+      releaseName: apicurio-registry
       valueFiles:
         - values.yaml
   destination:

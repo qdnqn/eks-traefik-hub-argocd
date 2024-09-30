@@ -21,6 +21,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: ikenna-apicurio-cluster
+  namespace: cloudnative-pg
 spec:
   description: "Pg cluster apicurio"
   imageName: ghcr.io/cloudnative-pg/postgresql:15.4
