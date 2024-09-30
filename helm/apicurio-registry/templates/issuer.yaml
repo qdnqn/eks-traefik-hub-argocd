@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: ikenna-http
-  namespace: whoami
+  namespace: apicurio-registry-operator-namespace
 spec:
   acme:
     email: user@example.com
