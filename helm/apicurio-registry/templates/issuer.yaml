@@ -5,7 +5,7 @@ metadata:
   namespace: apicurio-registry-operator-namespace
 spec:
   acme:
-    email: user@example.com
+    email: ikenna@ikenna.com
     # We use the staging server here for testing to avoid hitting
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
