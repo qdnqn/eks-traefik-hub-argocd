@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   annotations:
     test: app
+    external-dns.alpha.kubernetes.io/hostname: "apicurio.ikenna.dev"
   name: apicurio
   namespace: apicurio-registry-operator-namespace
 spec:
