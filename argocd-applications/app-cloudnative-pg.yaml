@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgres
+  namespace: argocd
+spec:
+  project: default
+  source:
+    path: helm/cloudnative-ph
+    repoURL: "https://github.com/qdnqn/eks-traefik-hub-argocd.git"
+    targetRevision: main
+    helm:
+      releaseName: cloudnative-pg
+      valueFiles:
+        - values.yaml
+  destination:
+    name: in-cluster
+    namespace: apicurio
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true

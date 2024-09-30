@@ -1,0 +1,13 @@
+apiVersion: registry.apicur.io/v1
+kind: ApicurioRegistry
+metadata:
+  name: ikenna-apicurioregistry-sql
+spec:
+  configuration:
+    persistence: "sql"
+    sql:
+      dataSource:
+        url: "jdbc:postgresql://postgres.svc:5432/ikenna"
+        userName: "postgres"
+        password: "testing-password" # Optional
+
