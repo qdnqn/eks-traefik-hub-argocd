@@ -198,6 +198,7 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   eks_managed_node_groups = {
+    iam_role_additional_policies = { AmazonEBSCSIDriverPolicy = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy" }
     initial = {
       instance_types = ["m5.large"]
 
