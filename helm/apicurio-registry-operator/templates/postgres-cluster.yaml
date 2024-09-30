@@ -24,7 +24,7 @@ metadata:
 spec:
   description: "Pg cluster apicurio"
   imageName: ghcr.io/cloudnative-pg/postgresql:15.4
-  instances: 3
+  instances: 1
   startDelay: 300
   stopDelay: 300
   primaryUpdateStrategy: unsupervised
@@ -36,7 +36,7 @@ spec:
   bootstrap:
     initdb:
       database: apicurio
-      owner: apicurio
+      owner: app
       secret:
         name: ikenna-apicurio-user
 
