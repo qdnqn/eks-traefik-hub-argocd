@@ -73,7 +73,7 @@ locals {
     enable_karpenter                             = try(var.addons.enable_karpenter, false)
     enable_velero                                = try(var.addons.enable_velero, false)
     enable_aws_gateway_api_controller            = try(var.addons.enable_aws_gateway_api_controller, false)
-    enable_aws_ebs_csi_resources                 = try(var.addons.enable_aws_ebs_csi_resources, false)
+    enable_aws_ebs_csi_resources                 = try(var.addons.enable_aws_ebs_csi_resources, true)
     enable_aws_secrets_store_csi_driver_provider = try(var.addons.enable_aws_secrets_store_csi_driver_provider, false)
     enable_ack_apigatewayv2                      = try(var.addons.enable_ack_apigatewayv2, false)
     enable_ack_dynamodb                          = try(var.addons.enable_ack_dynamodb, false)
