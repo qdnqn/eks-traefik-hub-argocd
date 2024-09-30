@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    test: app
+  name: apicurio
+  namespace: apicurio-registry-operator-namespace
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: ikenna-apicurioregistry-sql-service
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
