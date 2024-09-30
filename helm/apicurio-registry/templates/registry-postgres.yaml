@@ -8,7 +8,7 @@ spec:
     persistence: "sql"
     sql:
       dataSource:
-        url: "jdbc:postgresql://postgres.svc:5432/ikenna"
-        userName: "postgres"
-        password: "testing-password" # Optional
+        url: "jdbc:postgresql://ikenna-apicurio-cluster-rwk.apicurio-registry-operator-namespace.svc:5432/ikenna"
+        userName: "app"
+        password: "TxVeQ4nN82SSiYHoswqOURZvQDaL4KpNElsCEEe9bwDxMd73KckIeXzS5cU6LiC2"
 
