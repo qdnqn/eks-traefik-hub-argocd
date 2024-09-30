@@ -4,10 +4,15 @@ metadata:
   annotations:
     test: app
     external-dns.alpha.kubernetes.io/hostname: "apicurio.ikenna.dev"
+    cert-manager.io/issuer: "ikenna-http"
   name: apicurio
   namespace: apicurio-registry-operator-namespace
 spec:
   ingressClassName: traefik
+  tls:
+    - hosts:
+        - apicurio.ikenna.dev
+      secretName: ikenna-dev
   rules:
     - http:
         paths:
