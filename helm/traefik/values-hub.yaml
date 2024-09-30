@@ -1,13 +1,13 @@
-hub:
-  token: token
-  apimanagement:
-    enabled: true
+#hub:
+#  token: token
+#  apimanagement:
+#    enabled: true
 
-image:
-  registry: ghcr.io
-  repository: traefik/traefik-hub
-  tag: v3.4.0
-  pullPolicy: Always
+#image:
+#  registry: ghcr.io
+#  repository: traefik/traefik-hub
+#  tag: v3.4.0
+#  pullPolicy: Always
 
 ingressRoute:
   dashboard:
