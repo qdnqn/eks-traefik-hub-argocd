@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: postgres
+  name: apicurio
   namespace: argocd
 spec:
   project: default
   source:
-    path: helm/cloudnative-pg
+    path: helm/apicurio-registry-operator
     repoURL: "https://github.com/qdnqn/eks-traefik-hub-argocd.git"
     targetRevision: main
     helm:
-      releaseName: cloudnative-pg
+      releaseName: apicurio-registry-operator
       valueFiles:
         - values.yaml
   destination:
