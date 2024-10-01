@@ -91,5 +91,5 @@ jobs:
           kubectl create secret generic token --from-literal=token=$TRAEFIK_TOKEN -n traefik
           kubectl apply -f bootstrap/addons.yaml
           kubectl apply -f bootstrap/workloads.yaml
-          kubectl apply -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-1.24.0.yaml
+          kubectl apply --server-side -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-1.24.0.yaml
         continue-on-error: false
