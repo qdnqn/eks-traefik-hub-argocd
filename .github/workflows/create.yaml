@@ -88,7 +88,8 @@ jobs:
           chmod +x kubectl
           kubectl create ns traefik || echo "Already created"
           kubectl create ns apicurio-registry-operator-namespace  || echo "Already created"
-          kubectl create secret generic token --from-literal=token=$TRAEFIK_TOKEN -n traefik  || echo "Already created"
+          kubectl create secret generic ikenna-apicurio-user --from-literal=user=$POSTGRESS_USERNAME --from-literal=password=$POSTGRESS_PASSWORD -n apicurio-registry-operator-namespace  || echo "Already created"
+          kubectl create secret generic ikenna-apicurio-superuser --from-literal=user=postgres --from-literal=token=$POSTGRESS_PASSWORD -n apicurio-registry-operator-namespace  || echo "Already created"
           kubectl apply -f bootstrap/addons.yaml
           kubectl apply -f bootstrap/workloads.yaml
           kubectl delete -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg/main/releases/cnpg-1.24.0.yaml || echo "Cnpg not exists"
