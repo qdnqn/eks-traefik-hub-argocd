@@ -1,0 +1,77 @@
+name: Destroy EKS, ArgoCD and Traefik - scheduled
+
+on:
+  schedule:
+    - cron:  '0 19 * * *' #Replace second with Hour (0-24 format) at you wish action is triggered
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_DEPLOYMENT_NAME: ${{ vars.AWS_DEPLOYMENT_NAME }}
+  TERRAFORM_STATE_NAME: ${{ secrets.TERRAFORM_STATE_NAME }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform/
+    steps:
+      - uses: actions/checkout@v3
+      - uses: opentofu/setup-opentofu@v1
+
+      - name: Envsubst s3 bucket
+        id: envsubst
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext moreutils
+          envsubst < versions.tf | sponge versions.tf
+          envsubst < main.tf | sponge main.tf
+        continue-on-error: false
+
+      - name: Kubectl config
+        id: kubectl
+        run: |
+          export KUBECONFIG="/tmp/traefik-gitops-kubernetes"
+          aws eks --region $AWS_REGION update-kubeconfig --name $AWS_DEPLOYMENT_NAME
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          kubectl get pods
+          kubectl delete --wait=false ns/argocd --force || echo "Already gone"
+          kubectl delete --wait=false ns/traefik --force || echo "Already gone"
+        continue-on-error: true
+
+      - name: OpenTofu fmt
+        id: fmt
+        run: tofu fmt -check
+        continue-on-error: true
+
+      - name: OpenTofu Init
+        id: init
+        run: tofu init
+
+      - name: OpenTofu Destroy GitOps bridge
+        id: destroy-gitops
+        run: tofu destroy -target="module.gitops_bridge_bootstrap" -auto-approve
+        continue-on-error: false
+
+      - name: OpenTofu Destroy Addons
+        id: destroy-addons
+        run: tofu destroy -target="module.eks_blueprints_addons" -auto-approve
+        continue-on-error: false
+
+      - name: OpenTofu Destroy EKS
+        id: destroy-eks
+        run: tofu destroy -target="module.eks" -auto-approve
+        continue-on-error: false
+
+      - name: OpenTofu Destroy VPC
+        id: destroy-vpc
+        run: tofu destroy -target="module.vpc" -auto-approve
+        continue-on-error: false
+
+      - name: OpenTofu Destroy
+        id: destroy
+        run: tofu destroy -auto-approve
+        continue-on-error: false
