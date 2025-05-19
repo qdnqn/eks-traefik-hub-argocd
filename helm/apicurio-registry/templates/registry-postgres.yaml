@@ -10,4 +10,4 @@ spec:
       dataSource:
         url: "jdbc:postgresql://ikenna-apicurio-cluster-rw.apicurio-registry-operator-namespace.svc:5432/apicurio"
         userName: "postgres"
-        password: "uN3i1Hh0bYbCc4TyVAacBhmSzgqtzqxmOVjAn0QIChsJrSmu9PY2fw2q8EKKLpZ9"
+        password: "pCcLwtG7fSkgev6UPBnMVmzNuKQ9T4EaWd8s3FXJ"
