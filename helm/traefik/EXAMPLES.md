@@ -94,13 +94,31 @@ ingressRoute:
     enabled: true
 ```
 
-The traefik admin port can be forwarded locally:
+The traefik admin port can be forwarded locally. Assuming the default `traefik` namespace is used:
 
 ```bash
-kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name) 9000:9000
+NAMESPACE=traefik
+kubectl port-forward $(kubectl get pods --selector "app.kubernetes.io/name=traefik" --output=name -n $NAMESPACE) 8080:8080 -n $NAMESPACE
 ```
 
-This command makes the dashboard accessible on the url: http://127.0.0.1:9000/dashboard/
+This command makes the dashboard accessible through the URL: http://127.0.0.1:8080/dashboard/
+
+> [!IMPORTANT]
+> Note that the slash is required.
+
+# Redirect permanently traffic from http to https
+
+It's possible to redirect all incoming requests on an entrypoint to an other entrypoint.
+
+```yaml
+ports:
+  web:
+    redirections:
+      entryPoint:
+        to: websecure
+        scheme: https
+        permanent: true
+```
 
 # Publish and protect Traefik Dashboard with basic Auth
 
@@ -173,7 +191,7 @@ extraObjects:
       ports:
       - port: 8080
         name: traefik
-        targetPort: 9000
+        targetPort: 8080
         protocol: TCP
 
   - apiVersion: v1
@@ -305,7 +323,7 @@ extraObjects:
       config:
         type: HTTP
         httpHealthCheck:
-          port: 9000
+          port: 8080
           requestPath: /ping
     targetRef:
       group: ""
@@ -331,14 +349,15 @@ Here is a more complete example, using also native Let's encrypt feature of Trae
 persistence:
   enabled: true
   size: 128Mi
-certResolvers:
+certificatesResolvers:
   letsencrypt:
-    email: "{{ letsencrypt_email }}"
-    #caServer: https://acme-v02.api.letsencrypt.org/directory # Production server
-    caServer: https://acme-staging-v02.api.letsencrypt.org/directory # Staging server
-    dnsChallenge:
-      provider: azuredns
-    storage: /data/acme.json
+    acme:
+      email: "{{ letsencrypt_email }}"
+      #caServer: https://acme-v02.api.letsencrypt.org/directory # Production server
+      caServer: https://acme-staging-v02.api.letsencrypt.org/directory # Staging server
+      dnsChallenge:
+        provider: azuredns
+      storage: /data/acme.json
 env:
   - name: AZURE_CLIENT_ID
     value: "{{ azure_dns_challenge_application_id }}"
@@ -434,7 +453,11 @@ PROXY protocol is a protocol for sending client connection information, such as 
 ```yaml
 .DOTrustedIPs: &DOTrustedIPs
   - 127.0.0.1/32
-  - 10.120.0.0/16
+  # IP range Load Balancer is on
+  - 10.0.0.0/8
+  # IP range of private (VPC) interface - CHANGE THIS TO YOUR NETWORK SETTINGS
+  # This is needed when "externalTrafficPolicy: Cluster" is specified, as inbound traffic from the load balancer to a Traefik instance could be redirected from another cluster node on the way through.
+  - 172.16.0.0/12
 
 service:
   enabled: true
@@ -459,23 +482,43 @@ ports:
       trustedIPs: *DOTrustedIPs
 ```
 
-# Enable plugin storage
+# Using plugins
 
-This chart follows common security practices: it runs as non root with a readonly root filesystem.
-When enabling a plugin which needs storage, you have to add it to the deployment.
+This chart follows common security practices: it runs as non-root with a readonly root filesystem.
+When enabling a plugin, this Chart provides by default an `emptyDir` for plugin storage.
 
-Here is a simple example with crowdsec. You may want to replace with your plugin or see complete exemple on crowdsec [here](https://github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin/blob/main/examples/kubernetes/README.md).
+Here is an example with [crowdsec](https://github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin/blob/main/examples/kubernetes/README.md) plugin:
+
+```yaml
+experimental:
+  plugins:
+    demo:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.3.5
+```
+
+When persistence is needed, this `emptyDir` can be replaced with a PVC by adding:
 
 ```yaml
 deployment:
   additionalVolumes:
   - name: plugins
+    persistentVolumeClaim:
+      claimName: my-plugins-vol
 additionalVolumeMounts:
 - name: plugins
   mountPath: /plugins-storage
-additionalArguments:
-- "--experimental.plugins.bouncer.moduleName=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
-- "--experimental.plugins.bouncer.version=v1.1.9"
+extraObjects:
+  - kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: my-plugins-vol
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
 ```
 
 # Use Traefik native Let's Encrypt integration, without cert-manager
@@ -491,7 +534,7 @@ See [#396](https://github.com/traefik/traefik-helm-chart/issues/396) for more de
 Once the provider is ready, it can be used in an `IngressRoute`:
 
 ```yaml
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: [...]
@@ -501,6 +544,8 @@ spec:
   tls:
     certResolver: letsencrypt
 ```
+
+:information_source: Change `apiVersion` to `traefik.containo.us/v1alpha1` for charts prior to v28.0.0
 
 See [the list of supported providers](https://doc.traefik.io/traefik/https/acme/#providers) for others.
 
@@ -527,11 +572,12 @@ stringData:
 persistence:
   enabled: true
   storageClass: xxx
-certResolvers:
+certificatesResolvers:
   letsencrypt:
-    dnsChallenge:
-      provider: cloudflare
-    storage: /data/acme.json
+    acme:
+      dnsChallenge:
+        provider: cloudflare
+      storage: /data/acme.json
 env:
   - name: CF_DNS_API_TOKEN
     valueFrom:
@@ -550,6 +596,9 @@ podSecurityContext:
   fsGroup: 65532
   fsGroupChangePolicy: "OnRootMismatch"
 ```
+
+>[!NOTE]
+> With [Traefik Hub](https://traefik.io/traefik-hub/), certificates can be stored as a `Secret` on Kubernetes with `distributedAcme` resolver.
 
 # Provide default certificate with cert-manager and CloudFlare DNS
 
@@ -694,8 +743,8 @@ spec:
     app.kubernetes.io/name: traefik
     app.kubernetes.io/instance: traefik-traefik
   ports:
-  - port: 9000
-    name: "traefik"
+  - port: 8080
+    name: traefik
     targetPort: traefik
     protocol: TCP
 ```
@@ -774,14 +823,15 @@ tlsOptions:
 
 # Use latest build of Traefik v3 from master
 
-An experimental build of Traefik Proxy is available on a specific repository.
+An experimental build of Traefik Proxy is available on a specific community repository: `traefik/traefik`.
 
-It can be used with those _values_:
+The tag does not follow semver, so it requires a _versionOverride_:
 
 ```yaml
 image:
   repository: traefik/traefik
-  tag: experimental-v3.0
+  tag: experimental-v3.4
+versionOverride: v3.4
 ```
 
 # Use Prometheus Operator
@@ -814,6 +864,9 @@ metrics:
       jobLabel: traefik
       interval: 30s
       honorLabels: true
+    headerLabels:
+      user_id: X-User-Id
+      tenant: X-Tenant
     prometheusRule:
       enabled: true
       rules:
@@ -899,6 +952,8 @@ spec:
 Once it's applied, whoami should be accessible on http://whoami.docker.localhost/
 
 </details>
+
+:information_source: In this example, `Deployment` and `HTTPRoute` should be deployed in the same namespace as the Traefik Gateway: Chart namespace.
 
 # Use Kubernetes Gateway API with cert-manager
 
@@ -1003,3 +1058,65 @@ spec:
 Once it's applied, whoami should be accessible on https://whoami.docker.localhost/
 
 </details>
+
+# Use templating for additionalVolumeMounts
+
+This example demonstrates how to use templating for the `additionalVolumeMounts` configuration to dynamically set the `subPath` parameter based on a variable.
+
+```yaml
+additionalVolumeMounts:
+  - name: plugin-volume
+    mountPath: /plugins
+    subPath: "{{ .Values.pluginVersion }}"
+```
+
+In your `values.yaml` file, you can specify the `pluginVersion` variable:
+
+```yaml
+pluginVersion: "v1.2.3"
+```
+
+This configuration will mount the `plugin-volume` at `/plugins` with the `subPath` set to `v1.2.3`.
+
+# Use a custom certificate for Traefik Hub webhooks
+
+Some users are facing issues using CD tools while it invokes helm template. Hub mutating webhooks cert keeps being updated.
+This example demonstrates how to generate and use a custom certificate for Hub admission webhooks.
+
+First, generate a self-signed certificate:
+
+```bash
+# this generates a self-signed certificate with a 2048 bits key, valid for 10 years, on admission.traefik.svc DNS name
+openssl req -x509 -newkey rsa:2048 -sha256 -days 3650 -nodes -keyout /tmp/hub.key -out /tmp/hub.crt \
+            -subj "/CN=admission.traefik.svc" -addext "subjectAltName=DNS:admission.traefik.svc"
+```
+
+Now use it while installing Traefik Hub:
+
+```bash
+helm upgrade --install --namespace traefik traefik traefik/traefik \
+  --set hub.token=traefik-hub-license \
+  --set hub.apimanagement.enabled=true \
+  --set hub.apimanagement.admission.customWebhookCertificate.tls.crt=$(cat /tmp/hub.crt | base64 -w0) \
+  --set hub.apimanagement.admission.customWebhookCertificate.tls.key=$(cat /tmp/hub.key | base64 -w0) \
+  --set image.registry=ghcr.io --set image.repository=traefik/traefik-hub --set image.tag=v3.16.0
+```
+
+# Mount datadog DSD socket directly into traefik container (i.e. no more socat sidecar)
+
+This example demonstrates how to directly mount datadog apm socket into traefik container, thus avoiding the need of socat sidecar container.
+
+```yaml
+metrics:
+  datadog:
+    address: unix:///var/run/datadog/dsd.socket # https://doc.traefik.io/traefik/observability/metrics/datadog/#address
+additionalVolumeMounts:
+  - name: ddsocketdir
+    mountPath: /var/run/datadog
+    readOnly: false
+deployment:
+  additionalVolumes:
+    - hostPath:
+        path: /var/run/datadog/
+      name: ddsocketdir
+```

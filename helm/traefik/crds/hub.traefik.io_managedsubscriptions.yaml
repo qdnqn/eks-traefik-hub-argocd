@@ -4,21 +4,22 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.1
-  name: apiratelimits.hub.traefik.io
+  name: managedsubscriptions.hub.traefik.io
 spec:
   group: hub.traefik.io
   names:
-    kind: APIRateLimit
-    listKind: APIRateLimitList
-    plural: apiratelimits
-    singular: apiratelimit
+    kind: ManagedSubscription
+    listKind: ManagedSubscriptionList
+    plural: managedsubscriptions
+    singular: managedsubscription
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: APIRateLimit defines how group of consumers are rate limited
-          on a set of APIs.
+        description: |-
+          ManagedSubscription defines a Subscription managed by the API manager as the result of a pre-negotiation with its
+          API consumers. This subscription grant consuming access to a set of APIs to a set of Applications.
         properties:
           apiVersion:
             description: |-
@@ -38,12 +39,41 @@ spec:
           metadata:
             type: object
           spec:
-            description: The desired behavior of this APIRateLimit.
+            description: The desired behavior of this ManagedSubscription.
             properties:
+              apiBundles:
+                description: |-
+                  APIBundles defines a set of APIBundle that will be accessible.
+                  Multiple ManagedSubscriptions can select the same APIBundles.
+                items:
+                  description: APIBundleReference references an APIBundle.
+                  properties:
+                    name:
+                      description: Name of the APIBundle.
+                      maxLength: 253
+                      type: string
+                  required:
+                  - name
+                  type: object
+                maxItems: 100
+                type: array
+                x-kubernetes-validations:
+                - message: duplicated apiBundles
+                  rule: self.all(x, self.exists_one(y, x.name == y.name))
+              apiPlan:
+                description: APIPlan defines which APIPlan will be used.
+                properties:
+                  name:
+                    description: Name of the APIPlan.
+                    maxLength: 253
+                    type: string
+                required:
+                - name
+                type: object
               apiSelector:
                 description: |-
-                  APISelector selects the APIs that will be rate limited.
-                  Multiple APIRateLimits can select the same set of APIs.
+                  APISelector selects the APIs that will be accessible.
+                  Multiple ManagedSubscriptions can select the same set of APIs.
                   This field is optional and follows standard label selector semantics.
                   An empty APISelector matches any API.
                 properties:
@@ -92,8 +122,8 @@ spec:
                 x-kubernetes-map-type: atomic
               apis:
                 description: |-
-                  APIs defines a set of APIs that will be rate limited.
-                  Multiple APIRateLimits can select the same APIs.
+                  APIs defines a set of APIs that will be accessible.
+                  Multiple ManagedSubscriptions can select the same APIs.
                   When combined with APISelector, this set of APIs is appended to the matching APIs.
                 items:
                   description: APIReference references an API.
@@ -110,52 +140,61 @@ spec:
                 x-kubernetes-validations:
                 - message: duplicated apis
                   rule: self.all(x, self.exists_one(y, x.name == y.name))
-              everyone:
+              applications:
                 description: |-
-                  Everyone indicates that all users will, by default, be rate limited with this configuration.
-                  If an APIRateLimit explicitly target a group, the default rate limit will be ignored.
-                type: boolean
-              groups:
-                description: |-
-                  Groups are the consumer groups that will be rate limited.
-                  Multiple APIRateLimits can target the same set of consumer groups, the most restrictive one applies.
-                  When a consumer belongs to multiple groups, the least restrictive APIRateLimit applies.
+                  Applications references the Applications that will gain access to the specified APIs.
+                  Multiple ManagedSubscriptions can select the same AppID.
                 items:
-                  type: string
+                  description: ApplicationReference references an Application.
+                  properties:
+                    appId:
+                      description: |-
+                        AppID is the public identifier of the application.
+                        In the case of OIDC, it corresponds to the clientId.
+                      maxLength: 253
+                      type: string
+                  required:
+                  - appId
+                  type: object
+                maxItems: 100
+                minItems: 1
                 type: array
-              limit:
-                description: Limit is the maximum number of token in the bucket.
+              claims:
+                description: Claims specifies an expression that validate claims in
+                  order to authorize the request.
+                type: string
+              operationFilter:
+                description: |-
+                  OperationFilter specifies the allowed operations on APIs and APIVersions.
+                  If not set, all operations are available.
+                  An empty OperationFilter prohibits all operations.
+                properties:
+                  include:
+                    description: Include defines the names of OperationSets that will
+                      be accessible.
+                    items:
+                      type: string
+                    maxItems: 100
+                    type: array
+                type: object
+              weight:
+                description: |-
+                  Weight specifies the evaluation order of the APIPlan.
+                  When multiple ManagedSubscriptions targets the same API and Application with different APIPlan,
+                  the APIPlan with the highest weight will be enforced. If weights are equal, alphabetical order is used.
                 type: integer
                 x-kubernetes-validations:
                 - message: must be a positive number
                   rule: self >= 0
-              period:
-                description: Period is the unit of time for the Limit.
-                format: duration
-                type: string
-                x-kubernetes-validations:
-                - message: must be between 1s and 1h
-                  rule: self >= duration('1s') && self <= duration('1h')
-              strategy:
-                description: |-
-                  Strategy defines how the bucket state will be synchronized between the different Traefik Hub instances.
-                  It can be, either "local" or "distributed".
-                enum:
-                - local
-                - distributed
-                type: string
             required:
-            - limit
+            - apiPlan
+            - applications
             type: object
-            x-kubernetes-validations:
-            - message: groups and everyone are mutually exclusive
-              rule: '(has(self.everyone) && has(self.groups)) ? !(self.everyone &&
-                self.groups.size() > 0) : true'
           status:
-            description: The current status of this APIRateLimit.
+            description: The current status of this ManagedSubscription.
             properties:
               hash:
-                description: Hash is a hash representing the APIRateLimit.
+                description: Hash is a hash representing the ManagedSubscription.
                 type: string
               syncedAt:
                 format: date-time

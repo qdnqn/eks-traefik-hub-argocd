@@ -50,15 +50,16 @@
 {{- end }}
 
 {{- define "traefik.service-ports" }}
- {{- range $name, $config := .ports }}
+ {{- range $portName, $config := .ports }}
+  {{- $name := $portName | lower -}}
   {{- if (index (default dict $config.expose) $.serviceName) }}
   {{- $port := default $config.port $config.exposedPort }}
   {{- if empty $port }}
     {{- fail (print "ERROR: Cannot create " (trim $name) " port on Service without .port or .exposedPort") }}
   {{- end }}
   - port: {{ $port }}
-    name: {{ $name | quote }}
-    targetPort: {{ default $name $config.targetPort }}
+    name: {{ include "traefik.portname" $name }}
+    targetPort: {{ default $name $config.targetPort | include "traefik.portreference" }}
     protocol: {{ default "TCP" $config.protocol }}
     {{- if $config.nodePort }}
     nodePort: {{ $config.nodePort }}
@@ -69,8 +70,8 @@
   {{- if and ($config.http3).enabled ($config.single) }}
   {{- $http3Port := default $config.exposedPort $config.http3.advertisedPort }}
   - port: {{ $http3Port }}
-    name: "{{ $name }}-http3"
-    targetPort: "{{ $name }}-http3"
+    name: {{ printf "%s-http3" $name | include "traefik.portname" }}
+    targetPort: {{ default $name $config.targetPort | include "traefik.portreference" }}
     protocol: UDP
     {{- if $config.nodePort }}
     nodePort: {{ $config.nodePort }}

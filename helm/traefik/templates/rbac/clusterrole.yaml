@@ -1,4 +1,4 @@
-{{- $version := include "imageVersion" $ }}
+{{- $version := include "traefik.proxyVersion" $ }}
 {{- if and .Values.rbac.enabled (not .Values.rbac.namespaced) }}
 ---
 kind: ClusterRole
@@ -11,16 +11,6 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-{{ . }}: "true"
     {{- end }}
 rules:
-  {{- if semverCompare ">=v3.1.0-0" $version }}
-  - apiGroups:
-      - ""
-    resources:
-      - nodes
-    verbs:
-      - get
-      - list
-      - watch
-  {{- end }}
   {{- if (semverCompare "<v3.1.0-0" $version) }}
   - apiGroups:
       - ""
@@ -45,6 +35,10 @@ rules:
   - apiGroups:
       - ""
     resources:
+      {{- if and .Values.providers.kubernetesCRD.enabled (semverCompare ">=v3.4.0-0" $version) }}
+      - configmaps
+      {{- end }}
+      - nodes
       - services
     verbs:
       - get
@@ -69,7 +63,7 @@ rules:
       - get
       - list
       - watch
-    {{- if and .Values.hub.token .Values.hub.apimanagement.enabled }}
+    {{- if and .Values.hub.token }}
       - update
       - create
       - delete
@@ -105,6 +99,17 @@ rules:
       - update
   {{- end -}}
   {{- if .Values.providers.kubernetesCRD.enabled }}
+   {{- if not .Values.providers.kubernetesIngress.enabled }}
+  - apiGroups:
+      - extensions
+      - networking.k8s.io
+    resources:
+      - ingressclasses
+    verbs:
+      - get
+      - list
+      - watch
+   {{- end }}
   - apiGroups:
       - traefik.io
     resources:
@@ -132,25 +137,24 @@ rules:
       - endpoints
     {{- end }}
       - secrets
-      - services
+    {{- if semverCompare ">=v3.2.0-0" $version }}
+      - configmaps
+    {{- end }}
     verbs:
       - get
       - list
       - watch
-    {{- if (semverCompare ">=v3.1.0-0" $version) }}
-  - apiGroups:
-      - discovery.k8s.io
-    resources:
-      - endpointslices
-    verbs:
-      - list
-      - watch
-    {{- end }}
   - apiGroups:
       - gateway.networking.k8s.io
     resources:
+      {{- if semverCompare ">=v3.2.0-0" $version }}
+      - backendtlspolicies
+      {{- end }}
       - gatewayclasses
       - gateways
+      {{- if semverCompare ">=v3.2.0-0" $version }}
+      - grpcroutes
+      {{- end }}
       - httproutes
       - referencegrants
       - tcproutes
@@ -162,8 +166,14 @@ rules:
   - apiGroups:
       - gateway.networking.k8s.io
     resources:
+      {{- if semverCompare ">=v3.2.0-0" $version }}
+      - backendtlspolicies/status
+      {{- end }}
       - gatewayclasses/status
       - gateways/status
+      {{- if semverCompare ">=v3.2.0-0" $version }}
+      - grpcroutes/status
+      {{- end }}
       - httproutes/status
       - tcproutes/status
       - tlsroutes/status
@@ -183,8 +193,14 @@ rules:
       - update
       - patch
       - delete
-  {{- end }}
-  {{- if .Values.hub.token }}
+  - apiGroups:
+      - hub.traefik.io
+    resources:
+      - aiservices
+    verbs:
+      - list
+      - watch
+      - get
     {{- if or (semverCompare ">=v3.1.0-0" $version) .Values.hub.apimanagement.enabled }}
   - apiGroups:
       - ""
@@ -212,11 +228,14 @@ rules:
       - hub.traefik.io
     resources:
       - accesscontrolpolicies
-      - apiaccesses
       - apiportals
       - apiratelimits
       - apis
       - apiversions
+      - apibundles
+      - apiplans
+      - apicatalogitems
+      - managedsubscriptions
     verbs:
       - list
       - watch
